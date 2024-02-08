@@ -4,9 +4,101 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.22.0/tabler-icons.min.css"
+		/>
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover">
+	<body
+		data-sveltekit-preload-data="hover"
+		class="bg-body text-body font-body scroll-pt-24 bg-gray-950 text-white antialiased"
+	>
 		<div style="display: contents">%sveltekit.body%</div>
+
+		<script lang="js">
+			const accept = document.getElementById('accept-button');
+			const reject = document.getElementById('reject-button');
+			const banner = document.getElementById('consent-banner');
+
+			function animateIn() {
+				banner.classList.add('flex');
+				banner.classList.remove('hidden');
+			}
+
+			function animateOut() {
+				banner.classList.remove('animate-in', 'opacity-100');
+				banner.classList.add('translate-y-full', 'opacity-0');
+				banner.ontransitionend = () => {
+					banner.classList.add('hidden');
+					banner.classList.remove('flex');
+				};
+			}
+
+			function setConsent(consent) {
+				localStorage.setItem('consent', consent.toString());
+				localStorage.setItem('consentDate', new Date().toISOString());
+				if (consent) grantAnalyticsConsent();
+				animateOut();
+			}
+
+			accept.addEventListener('click', () => setConsent(true));
+			reject.addEventListener('click', () => setConsent(false));
+
+			localStorage.setItem('consentDate', new Date().toISOString());
+			if (localStorage.getItem('consentDate') !== null) {
+				// If consent was given before December 1, 2023, reset consent
+				// Update this date whenever you update your privacy policy or tracking
+				const consentOutdated =
+					new Date(localStorage.getItem('consentDate')).valueOf() <
+					new Date('2023-12-01').valueOf();
+				const rejectedConsent7DaysAgo =
+					localStorage.getItem('consent') === 'false' &&
+					new Date(localStorage.getItem('consentDate')).valueOf() <
+						new Date().setDate(new Date().getDate() - 7).valueOf();
+				if (consentOutdated || rejectedConsent7DaysAgo) {
+					localStorage.removeItem('consent');
+					localStorage.removeItem('consentDate');
+				}
+			}
+
+			if (localStorage.getItem('consent') === null) animateIn();
+			if (localStorage.getItem('consent') === 'true') grantAnalyticsConsent();
+
+			// Google Analytics Consent Mode
+			// https://developers.google.com/tag-platform/security/guides/consent
+			// Define dataLayer and the gtag function.
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				window.dataLayer = window.dataLayer || [];
+				window.dataLayer.push(arguments);
+			}
+
+			// Set default consent to 'denied' as a placeholder
+			// Determine actual values based on your own requirements
+			gtag('consent', 'default', {
+				ad_storage: 'denied',
+				ad_user_data: 'denied',
+				ad_personalization: 'denied',
+				analytics_storage: 'denied'
+			});
+
+			function grantAnalyticsConsent() {
+				gtag('consent', 'update', {
+					analytics_storage: 'granted'
+				});
+			}
+		</script>
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-V5SFFY7NM1"></script>
+		<script lang="js">
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+
+			gtag('js', new Date());
+			gtag('config', 'G-X3X66ZHX6W');
+		</script>
 	</body>
 </html>

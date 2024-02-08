@@ -1,0 +1,14 @@
+<script lang="ts">
+	export let title: string;
+</script>
+
+<div class="rounded-xl border border-gray-600/50 bg-gray-900/80 p-6 backdrop-blur-md sm:p-6">
+	<div class="flex items-center gap-5">
+		<h3 class="font-display flex-auto text-2xl font-bold text-gray-200">
+			{title}
+		</h3>
+	</div>
+	<div class="mt-4">
+		<slot />
+	</div>
+</div>

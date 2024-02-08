@@ -1,0 +1,54 @@
+<script lang="ts">
+  import { classes, styles } from "$lib/theme"
+  import ChevronDown from "lucide-svelte/chevron-down.svelte"
+  // Todo probably also support string[] for options
+  export type SelectButtonOption = {
+    label: string
+    value: string | null
+    icon?: string
+  }
+  export let options: SelectButtonOption[]
+  export let value: SelectButtonOption
+  export let setValue: Setter<SelectButtonOption>
+  export let class?: string
+    const anyIcon = props.options.some((option) => option.icon)
+</script>
+
+    <Select.Root
+      value={props.value()}
+      onChange={props.setValue}
+      options={props.options}
+      optionValue="value"
+      optionTextValue="label"
+      class={props.class}
+      disallowEmptySelection
+      itemComponent={(props) => (
+        <Select.Item item={props.item} class={styles.dropdown.item}>
+          <Select.ItemLabel class="flex items-center font-semibold">
+            {props.item.rawValue?.icon ? (
+              <img src={props.item.rawValue?.icon} class="mr-2 w-4 object-contain" />
+            ) : anyIcon ? (
+              <span class="w-6" />
+            ) : (
+              <></>
+            )}
+            {props.item.rawValue?.label}
+          </Select.ItemLabel>
+        </Select.Item>
+      )}
+    >
+      <Select.Trigger class={classes(styles.button.base, "w-full")}>
+        <Select.Value<string> class={classes(styles.button.sm, "inline-flex flex-auto items-center font-semibold")}>
+          {props.value()?.icon && <img src={props.value()?.icon} class="mr-2 w-4 object-contain" />}
+          {props.value()?.label}
+        </Select.Value>
+        <Select.Icon class={classes(styles.button.sm, styles.button.trigger, "flex-none")}>
+          <span class="text-gray-300 *:w-4 sm:*:-mx-1" innerHTML={chevronDown} />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Content class={styles.dropdown.wrapper}>
+          <Select.Listbox class={styles.dropdown.list} />
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
